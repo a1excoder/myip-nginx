@@ -1,0 +1,41 @@
+server {
+	listen [::]:80;
+	
+	server_name v6.example.com;
+
+	access_log /var/log/nginx/v6.example.com.access.log;
+	error_log /var/log/nginx/v6.example.com.error.log;
+
+  location / {
+   	add_header Access-Control-Allow-Origin "http://myip.example.com";
+   	add_header Vary "Origin";
+		add_header Content-Type application/json always;
+
+		return 200 '{"ip": "$remote_addr", "port": "$remote_port"}';  
+		try_files $uri $uri/ =404;
+  }
+
+}
+
+
+server {
+	listen [::]:443 ssl ipv6only=on;
+	http2 on;
+	
+	server_name v6.example.com;
+
+	access_log /var/log/nginx/v6.example.com.access.log;
+	error_log /var/log/nginx/v6.example.com.error.log;
+
+	ssl_certificate	/etc/letsencrypt/live/v6.example.com/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/v6.example.com/privkey.pem;
+	
+  location / {
+   	add_header Access-Control-Allow-Origin "https://myip.example.com";
+   	add_header Vary "Origin";
+		add_header Content-Type application/json always;
+
+		return 200 '{"ip": "$remote_addr", "port": "$remote_port"}';
+		try_files $uri $uri/ =404;
+  }
+}
